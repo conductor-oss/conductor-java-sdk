@@ -12,6 +12,10 @@
  */
 package io.orkes.conductor.client.spring;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.URI;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -20,6 +24,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
 
 import com.netflix.conductor.client.spring.ClientProperties;
 
@@ -34,11 +39,6 @@ import io.orkes.conductor.client.http.OrkesTaskClient;
 import io.orkes.conductor.client.http.OrkesWorkflowClient;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
-
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.URI;
 
 @AutoConfiguration
 @Slf4j
