@@ -34,6 +34,11 @@ import io.orkes.conductor.client.http.OrkesTaskClient;
 import io.orkes.conductor.client.http.OrkesWorkflowClient;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
+
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.URI;
 
 @AutoConfiguration
 @Slf4j
@@ -45,7 +50,7 @@ public class OrkesConductorClientAutoConfiguration {
     @Primary
     @ConditionalOnMissingBean
     public ApiClient orkesConductorClient(ClientProperties clientProperties,
-                                          OrkesClientProperties orkesClientProperties) {
+                                          OrkesClientProperties orkesClientProperties, Environment environment) {
         var basePath = StringUtils.isBlank(clientProperties.getRootUri()) ? clientProperties.getBasePath() : clientProperties.getRootUri();
         if (basePath == null) {
             basePath = orkesClientProperties.getConductorServerUrl();
@@ -62,6 +67,14 @@ public class OrkesConductorClientAutoConfiguration {
                 .writeTimeout(clientProperties.getTimeout().getWrite())
                 .verifyingSsl(clientProperties.isVerifyingSsl());
 
+        var proxy = environment.getProperty("CONDUCTOR_SERVER_PROXY_URL");
+
+        if (proxy != null) {
+            var uri = URI.create(proxy);
+            var address = new InetSocketAddress(uri.getHost(), uri.getPort() == -1 ? 80 : uri.getPort());
+
+            builder.proxy(new Proxy(Proxy.Type.HTTP, address));
+        }
 
         if (orkesClientProperties.getKeyId() != null) {
             builder.credentials(orkesClientProperties.getKeyId(), orkesClientProperties.getSecret());
